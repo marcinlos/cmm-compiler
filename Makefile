@@ -22,6 +22,7 @@ SRC_FILES := ${YACC_SOURCES} \
 			 util.c			 \
 			 ast.c 			 \
 			 main.c 		 \
+			 types.c		 \
 			 symbol_table.c	 \
 			 static_analysis.c \
 			 ir.c 			 \

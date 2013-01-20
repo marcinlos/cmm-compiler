@@ -3,6 +3,7 @@
 
 typedef enum
 {
+    ST_UNKNOWN,
     ST_REG,
     ST_LOCAL,
     ST_GLOBAL

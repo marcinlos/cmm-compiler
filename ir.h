@@ -126,6 +126,7 @@ typedef struct
 } ir_item;
 
 address ir_mkempty(void);
+int ir_is_empty(address* addr);
 
 address ir_mkint(int n);
 address ir_mkchar(char c);

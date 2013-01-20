@@ -11,4 +11,7 @@ int main(char d)
     int a, b;
     char c[3];
 
+    madafaka;
+    "blah";
+    f("uck");
 }

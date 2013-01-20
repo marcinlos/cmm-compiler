@@ -369,7 +369,7 @@ stmt_list* append_stmt(stmt_list* list, stmt* s)
         prev->next = elem;
     else
         list = elem;
-    return elem;
+    return list;
 }
 
 void free_stmt_list(stmt_list* list)

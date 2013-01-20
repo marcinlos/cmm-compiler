@@ -15,6 +15,11 @@ address ir_mkempty(void)
     return addr;
 }
 
+int ir_is_empty(address* addr)
+{
+    return addr->type == ADDR_EMPTY;
+}
+
 address ir_mkint(int n)
 {
     address addr;
@@ -362,14 +367,14 @@ static char* print_data(char* buffer, ir_item* item)
     switch (item->data_type)
     {
     case DATA_RAW:
-        sprintf(data, ".space %d", item->bytes);
+        sprintf(data, "%s .space %d", item->name, item->bytes);
         strcat(buffer, data);
         break;
 
     case DATA_STRING:
     {
         char* escaped = escape_alloc(item->text);
-        sprintf(data, ".ascii \"%s\"", escaped);
+        sprintf(data, "%s .ascii \"%s\"", item->name, escaped);
         free(escaped);
         strcat(buffer, data);
         break;

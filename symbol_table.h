@@ -11,7 +11,8 @@ typedef enum
 {
     SYM_NONE,
     SYM_FUN,
-    SYM_VAR
+    SYM_VAR,
+    SYM_LITERAL
 } symbol_type;
 
 
@@ -41,6 +42,7 @@ typedef struct symbol_info
             type ret_type;
             scope_info* params;
         };
+        char* literal;
     };
     struct symbol_info* next;
 } symbol_info;
@@ -49,13 +51,16 @@ typedef struct symbol_info
 typedef struct symbol_table
 {
     scope_info* top_level;
+    symbol_info* literals;
 } symbol_table;
 
 
 
 symbol_info* sym_mkvar(const char* name, type type, codegen_info gen_info, scope_info* scope);
 symbol_info* sym_mkfunction(const char* name, type ret, scope_info* scope);
+symbol_info* sym_mkliteral(const char* name, const char* literal);
 void sym_add_param(symbol_info* fun, symbol_info* param);
+
 void free_symbol_info(symbol_info* sym);
 
 scope_info* sym_mkscope(scope_info* parent);
@@ -64,8 +69,13 @@ void sym_add_child_scope(scope_info* parent, scope_info* child);
 void free_scope_info(scope_info* scope);
 
 
+symbol_info* sym_find_no_traverse(const char* name, scope_info* scope);
+symbol_info* sym_find(const char* name, scope_info* scope);
+symbol_info* sym_add_literal(const char* literal, symbol_table* table);
 void clean_symbol_table(symbol_table* table);
 void free_symbol_table(symbol_table* table);
+
+int sym_print_strings(char* buffer, symbol_table* table);
 
 int sym_print_table(char* buffer, symbol_table* table);
 int sym_print_scope(char* buffer, scope_info* scope);

@@ -49,10 +49,17 @@ symbol_info* sym_mkfunction(const char* name, type ret, scope_info* scope)
     sym->name = strdup(name);
     sym->ret_type = ret;
     sym->scope = scope;
-    printf("przed mkscope name = %s\n", sym->name);
     sym->params = sym_mkscope(scope);
-    printf("przed add name = %s\n", sym->name);
     //sym_add_child_scope(scope, sym->params);
+    return sym;
+}
+
+symbol_info* sym_mkliteral(const char* name, const char* literal)
+{
+    symbol_info* sym = empty_symbol();
+    sym->symbol_type = SYM_LITERAL;
+    sym->name = strdup(name);
+    sym->literal = strdup(literal);
     return sym;
 }
 
@@ -68,6 +75,10 @@ void free_symbol_info(symbol_info* sym)
     assert(sym && "free_symbol_info: NULL argument");
     symbol_info* next = sym->next;
     free(sym->name);
+    if (sym->symbol_type == SYM_LITERAL)
+    {
+        free(sym->literal);
+    }
     free(sym);
     if (next)
     {
@@ -121,16 +132,68 @@ void free_scope_info(scope_info* scope)
     free(scope);
 }
 
+symbol_info* sym_find_no_traverse(const char* name, scope_info* scope)
+{
+    symbol_info* info = scope->symbols;
+    while (info != NULL)
+    {
+        if (strcmp(info->name, name) == 0)
+            return info;
+        else
+            info = info->next;
+    }
+    return NULL;
+}
+
+symbol_info* sym_find(const char* name, scope_info* scope)
+{
+    symbol_info* info = sym_find_no_traverse(name, scope);
+    if (info == NULL && scope->parent != NULL)
+    {
+        return sym_find(name, scope->parent);
+    }
+    return info;
+}
+
+symbol_info* sym_add_literal(const char* literal, symbol_table* table)
+{
+    assert(literal && "sym_add_literal: NULL literal");
+    int n = 1;
+    char buffer[32];
+    symbol_info* info = table->literals, *prev = NULL;
+
+    while (info != NULL)
+    {
+        if (strcmp(literal, info->literal) == 0)
+        {
+            return info;
+        }
+        ++ n;
+        prev = info;
+        info = info->next;
+    }
+    sprintf(buffer, "__STR_%d", n);
+    info = sym_mkliteral(buffer, literal);
+    if (prev != NULL)
+        prev->next = info;
+    else
+        table->literals = info;
+    return info;
+}
 
 
 void clean_symbol_table(symbol_table* table)
 {
     table->top_level = NULL;
+    table->literals = NULL;
 }
 
 void free_symbol_table(symbol_table* table)
 {
-    free_scope_info(table->top_level);
+    if (table->top_level)
+        free_scope_info(table->top_level);
+    if (table->literals)
+        free_symbol_info(table->literals);
     free(table);
 }
 
@@ -148,6 +211,12 @@ static int print_scope_tree(char* buffer, scope_info* scope)
     }
     return p - buffer;
 }
+
+int sym_print_strings(char* buffer, symbol_table* table)
+{
+    //ir_item item =ir_mkdata_string()
+}
+
 
 int sym_print_table(char* buffer, symbol_table* table)
 {
